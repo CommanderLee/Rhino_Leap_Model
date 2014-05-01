@@ -1,0 +1,26 @@
+﻿Option Explicit
+'Script written by <Zhen Li>
+'Script copyrighted by <Zhen Li, Tsinghua University>
+'Script version Wednesday, April 30, 2014 7:19:57 PM
+
+Call Main()
+Sub Main()
+	Dim rad, zeroP, cylEndP(2)
+	rad = 0.3
+	zeroP = Array(0, 0, 0)
+	cylEndP(0) = Array(6, 8, 0)
+	cylEndP(1) = Array(-6, 8, 0)
+	cylEndP(2) = Array(0, 8, 6)
+	
+	Dim cylinder(2), i
+	For i = 0 To 2
+		cylinder(i) = Rhino.AddCylinder(zeroP, cylEndP(i), rad)
+	Next
+	
+	Dim coneEndP(2), cone(2)
+	For i = 0 To 2
+		coneEndP(i) = Rhino.VectorScale(cylEndP(i), 1.1)
+		cone(i) = Rhino.AddCone(cylEndP(i), coneEndP(i), rad)
+	Next
+	
+End Sub
