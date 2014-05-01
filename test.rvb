@@ -1,0 +1,16 @@
+﻿Option Explicit
+'Script written by <insert name>
+'Script copyrighted by <insert company name>
+'Script version Thursday, May 01, 2014 8:34:33 PM
+
+Call Main()
+Sub Main()
+	Dim strSurface, strCurve
+
+	strSurface = Rhino.AddSrfPt(Array(Array(0, 0, 0), Array(5, 0, 0), Array(5, 5, 0), Array(0, 5, 0)))
+
+	strCurve = Rhino.AddLine(Array(5, 0, 0), Array(10, 0, 10))
+
+	Rhino.ExtrudeSurface strSurface, strCurve
+
+End Sub

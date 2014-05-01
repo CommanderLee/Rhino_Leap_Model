@@ -1,26 +1,64 @@
-﻿Option Explicit
+Option Explicit
 'Script written by <Zhen Li>
 'Script copyrighted by <Zhen Li, Tsinghua University>
 'Script version Wednesday, April 30, 2014 7:19:57 PM
 
 Call Main()
 Sub Main()
-	Dim rad, zeroP, cylEndP(2)
-	rad = 0.3
-	zeroP = Array(0, 0, 0)
-	cylEndP(0) = Array(6, 8, 0)
-	cylEndP(1) = Array(-6, 8, 0)
-	cylEndP(2) = Array(0, 8, 6)
+	' Some important size info. (mm)
+	Dim rad, thickM, halfThickC, halfLen, halfWid
+	rad = 3			' radius of the stick
+	thickM = 14		' thickness of the mobile phone
+	halfThickC = 5	' half thickness of the clip
+	halfLen = 50	' half length of the clip
+	halfWid = 10	' half width of the clip
 	
-	Dim cylinder(2), i
+	Dim zeroP, cylEndP(2)
+	zeroP = Array(0, 0, 0)
+	cylEndP(0) = Array(60, 80, 0)
+	cylEndP(1) = Array(-60, 80, 0)
+	cylEndP(2) = Array(0, 80, 60)
+	
+	Dim cylinder(2), i			'Make 3 Cylinders
 	For i = 0 To 2
 		cylinder(i) = Rhino.AddCylinder(zeroP, cylEndP(i), rad)
 	Next
 	
-	Dim coneEndP(2), cone(2)
+	Dim coneEndP(2), cone(2)	'Make 3 Cones on the Cylinders
 	For i = 0 To 2
 		coneEndP(i) = Rhino.VectorScale(cylEndP(i), 1.1)
 		cone(i) = Rhino.AddCone(cylEndP(i), coneEndP(i), rad)
 	Next
+	
+	Dim clipP(14), clipLine		' The points of the clip
+	clipP(0) = Array(halfLen, halfThickC, -halfWid)
+	clipP(1) = Array(halfLen - 20, halfThickC, -halfWid)
+	clipP(2) = Array(halfLen - 25, halfThickC - 2, -halfWid)
+	clipP(3) = Array(halfLen - 30, halfThickC, -halfWid)
+	clipP(4) = Array(-halfLen, halfThickC, -halfWid)
+	clipP(5) = Array(-halfLen, -halfThickC - thickM - halfThickC * 2, -halfWid)
+	clipP(6) = Array(halfLen - 30, -halfThickC - thickM - halfThickC * 2, -halfWid)
+	clipP(7) = Array(halfLen - 25, -halfThickC - thickM - halfThickC * 2 + 2, -halfWid)
+	clipP(8) = Array(halfLen - 20, -halfThickC - thickM - halfThickC * 2, -halfWid)
+	clipP(9) = Array(halfLen, -halfThickC - thickM - halfThickC * 2, -halfWid)
+	clipP(10) = Array(halfLen, -halfThickC - thickM, -halfWid)
+	clipP(11) = Array(-halfLen + 3 * halfThickC, -halfThickC - thickM, -halfWid)
+	clipP(12) = Array(-halfLen + 3 * halfThickC, -halfThickC, -halfWid)
+	clipP(13) = Array(halfLen, -halfThickC, -halfWid)
+	clipP(14) = clipP(0)
+	clipLine = Rhino.AddPolyline(clipP)
+	
+	Dim clipSurf, clipCurve, clip	' Clip Points -> Clip Line -> Clip Surface -> Clip
+	clipSurf = Rhino.AddPlanarSrf(clipLine)
+	clipCurve = Rhino.AddLine(Array(0, halfThickC, -halfWid), Array(0, halfThickC, halfWid))	
+	clip = Rhino.ExtrudeSurface(clipSurf(0), clipCurve)
+
+	Dim group, number
+	group = Rhino.AddGroup()
+	For i = 0 To 2
+		Rhino.AddObjectToGroup cone(i), group
+		Rhino.AddObjectToGroup cylinder(i), group
+	Next
+	Rhino.AddObjectToGroup clip, group
 	
 End Sub
